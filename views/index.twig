@@ -1,0 +1,70 @@
+{% extends 'layout.twig' %}
+
+{% block body %}
+  <div class="container">
+    <h1>Welcome to Ronin.Rest</h1>
+    <p class="alert alert-info">
+      ronin.rest is a REST API built by wehmoen#0001 and allows easy access to the Ronin chain and Origin game data.
+      <br>
+      ronin.rest is not affiliated with Sky Mavis!
+    </p>
+
+    <h2>Available Tools</h2>
+
+   <div class="row">
+     <div class="col-12 col-md-3">
+       <div class="card">
+         <div class="card-body">
+           <h5 class="card-title">
+             Axie Sales
+           </h5>
+           Easy to use marketplace sale history for all Axies.
+         </div>
+         <div class="card-footer">
+           <a href="/sales" class="btn btn-sm w-100 btn-primary">GO!</a>
+         </div>
+       </div>
+     </div>
+     <div class="col-12 col-md-3">
+       <div class="card">
+         <div class="card-body">
+           <h5 class="card-title">
+             Axie Transfers
+           </h5>
+           A comprehensive log of all transfers for all Axies!
+         </div>
+         <div class="card-footer">
+           <a href="/transfers" class="btn btn-sm w-100 btn-primary">GO!</a>
+         </div>
+       </div>
+     </div>
+     <div class="col-12 col-md-6">
+       <div class="card">
+         <div class="card-body">
+           <h5 class="card-title">
+            Donations
+           </h5>
+           Do you like Ronin.Rest and want to support me? I am grateful for any donations send to:
+           <code>
+             ronin:769ff23c2a296a769e7825b92d21d5f1ab453550
+           </code>
+         </div>
+         <div class="card-footer">
+           Cheers! ~ wehmoen#0001
+         </div>
+       </div>
+     </div>
+     <div class="col-12 mt-3">
+       <div class="card">
+         <div class="card-body">
+           <h5 class="card-title">
+            Are you a developer?
+           </h5>
+           Check out all available API endpoints at <a href="https://ronin.rest" target="_blank">https://ronin.rest</a>
+         </div>
+       </div>
+     </div>
+   </div>
+
+  </div>
+{% endblock %}

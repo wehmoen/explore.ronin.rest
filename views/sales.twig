@@ -1,0 +1,119 @@
+{% extends 'layout.twig' %}
+
+{% block body %}
+    <div class="container">
+        <h2>Simple Axie Transfer History <small>(RONIN only!)</small></h2>
+
+        <div id="select">
+            <input min="0" type="number" value="90212" placeholder="Enter AXIE Id here and click GO!" class="form-control-lg w-100">
+            <button class="btn btn-primary w-100 mt-2">GO!</button>
+
+        </div>
+
+        <div class="table-responsive">
+            <table class="table">
+                <thead>
+                <tr>
+                    <th>Seller</th>
+                    <th>Buyer</th>
+                    <th>Price</th>
+                    <th>Date</th>
+                    <th></th>
+                </tr>
+                </thead>
+                <tbody id="axie-sales"></tbody>
+            </table>
+            <a href="" id="api" target="_blank" class="d-none">Rest API</a>
+        </div>
+    </div>
+{% endblock %}
+{% block script %}
+    <script>
+        window.onload = function() {
+
+            const token_map = new Map();
+            token_map.set("0xc99a6a985ed2cac1ef41640596c5a5f9f4e19ef5", {
+                name: "WETH",
+                address: "0xc99a6a985ed2cac1ef41640596c5a5f9f4e19ef5",
+                decimals: 18,
+                format(number) {
+                    return number / 10 ** 18
+                }
+            });
+            Object.freeze(token_map);
+
+            const btn = document.querySelector("button");
+            const inp = document.querySelector('input[type="number"]');
+            const sls = document.querySelector("#axie-sales");
+            const api = document.querySelector("#api");
+
+            function tr() {
+                return document.createElement("tr")
+            }
+
+            function td() {
+                return document.createElement("td")
+            }
+
+            function link(label, href, _blank = true) {
+                const a = document.createElement("a");
+                a.innerText = label;
+                a.href = href;
+                if (_blank) {
+                    a.target ="_blank"
+                }
+                return a
+            }
+
+            btn.onclick = async function() {
+                const axieId = inp.value;
+                const url = `https://ronin.rest/archive/getAxieSaleHistory/${axieId}`;
+                api.href = url;
+                api.classList.remove("d-none")
+                const data = await (await fetch(url)).json()
+                sls.innerHTML = "";
+
+                if (data.sales.length === 0) {
+                    const row = tr();
+                    const cell = td();
+                    cell.colSpan = 5;
+                    cell.classList.add("text-center");
+                    cell.innerText = "No sales found for this Axie!"
+                    row.appendChild(cell);
+                    sls.appendChild(row)
+                } else {
+                    for (let i in data.sales) {
+                        let sale = data.sales[i];
+                        const row = tr();
+                        const seller = td();
+                        seller.innerText = sale.seller;
+                        const buyer = td();
+                        buyer.innerText = sale.buyer;
+                        const price = td();
+                        const token = token_map.get(sale.token);
+                        if (token !== undefined) {
+                            price.innerText = `${token.format(sale.price).toFixed(7)} ${token.name}`
+                        } else {
+                            price.innerText = `${sale.price} ${sale.token}`
+                        }
+
+                        const date = td();
+                        date.innerText = (new Date(sale.created_at)).toISOString().split("T").join(" ")
+                        const actions = td();
+                        actions.appendChild(
+                            link("Open in explorer", `https://explorer.roninchain.com/tx/${sale.transaction_id}`)
+                        )
+                        row.appendChild(seller)
+                        row.appendChild(buyer)
+                        row.appendChild(price)
+                        row.appendChild(date)
+                        row.appendChild(actions)
+                        sls.appendChild(row)
+                    }
+                }
+            }
+
+            btn.click()
+        }
+    </script>
+{% endblock %}

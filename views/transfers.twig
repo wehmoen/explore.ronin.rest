@@ -1,0 +1,99 @@
+{% extends 'layout.twig' %}
+
+{% block body %}
+    <div class="container">
+        <h2>Simple Axie Sale History <small>(RONIN only!)</small></h2>
+
+        <div id="select">
+            <input min="0" type="number" value="240424" placeholder="Enter AXIE Id here and click GO!" class="form-control-lg w-100">
+            <button class="btn btn-primary w-100 mt-2">GO!</button>
+
+            <div class="mt-2">
+                <p class="alert alert-info">
+                    Keep in mind that this page only list marketplace sales.
+                </p>
+            </div>
+        </div>
+
+        <div class="table-responsive">
+            <table class="table">
+                <thead>
+                <tr>
+                    <th>From</th>
+                    <th>To</th>
+                    <th>Date</th>
+                </tr>
+                </thead>
+                <tbody id="axie-transfers"></tbody>
+            </table>
+            <a href="" id="api" target="_blank" class="d-none">Rest API</a>
+        </div>
+    </div>
+{% endblock %}
+{% block script %}
+    <script>
+        window.onload = function() {
+
+            const btn = document.querySelector("button");
+            const inp = document.querySelector('input[type="number"]');
+            const sls = document.querySelector("#axie-transfers");
+            const api = document.querySelector("#api");
+
+            function tr() {
+                return document.createElement("tr")
+            }
+
+            function td() {
+                return document.createElement("td")
+            }
+
+            function link(label, href, _blank = true) {
+                const a = document.createElement("a");
+                a.innerText = label;
+                a.href = href;
+                if (_blank) {
+                    a.target ="_blank"
+                }
+                return a
+            }
+
+            btn.onclick = async function() {
+                const axieId = inp.value;
+                const url = `https://ronin.rest/archive/getAxieTransferHistory/${axieId}`;
+                api.href = url;
+                api.classList.remove("d-none")
+                const data = await (await fetch(url)).json()
+                sls.innerHTML = "";
+
+                if (data.transfers.length === 0) {
+                    const row = tr();
+                    const cell = td();
+                    cell.colSpan = 3;
+                    cell.classList.add("text-center");
+                    cell.innerText = "No transfers found for this Axie!"
+                    row.appendChild(cell);
+                    sls.appendChild(row)
+                } else {
+                    for (let i in data.transfers) {
+                        let transfer = data.transfers[i];
+                        const row = tr();
+                        const from = td();
+                        from.innerText = transfer.from;
+                        const to = td();
+                        to.innerText = transfer.to;
+
+                        const date = td();
+                        date.innerText = (new Date(transfer.created_at)).toISOString().split("T").join(" ")
+
+                        row.appendChild(from)
+                        row.appendChild(to)
+                        row.appendChild(date)
+                        sls.appendChild(row)
+                    }
+                }
+            }
+
+            btn.click()
+        }
+    </script>
+{% endblock %}
