@@ -66,6 +66,47 @@
        </div>
      </div>
    </div>
-
+    <div class="row">
+      <div class="col-12">
+        <hr>
+        <h2>Service Health</h2>
+      </div>
+    </div>
+    <div class="row" id="health_info"></div>
   </div>
+{% endblock %}
+{% block script %}
+<script>
+  window.onload = async function() {
+    const service_health = await (await fetch("https://ronin.rest/misc/health")).json()
+    function health_container(name, healthy) {
+      const col = document.createElement("div");
+      col.classList.add("col");
+      col.classList.add("mt-2");
+      const con = document.createElement("div");
+      con.classList.add(`bg-${healthy ? 'success': 'danger'}`);
+      con.classList.add("card")
+      const body = document.createElement("div")
+      body.classList.add("card-body")
+      body.classList.add("text-center")
+      const title = document.createElement("h4")
+      title.classList.add("card-title")
+      title.innerText = name;
+      const content = document.createElement("span")
+      content.innerText = healthy ? "UP!": "DOWN!";
+      content.classList.add("text-white")
+      content.classList.add("fw-bold")
+      content.classList.add("fs-3")
+      body.appendChild(title)
+      body.appendChild(content)
+      con.appendChild(body)
+      col.appendChild(con)
+      document.getElementById("health_info").appendChild(col)
+    }
+
+    for (const h in service_health) {
+      health_container(h, service_health[h].healthy)
+    }
+  }
+</script>
 {% endblock %}
