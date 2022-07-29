@@ -1,0 +1,156 @@
+{% extends 'layout.twig' %}
+
+{% block body %}
+    <div class="container">
+
+
+        <div class="row">
+            <div class="col-12">
+                <h2>Origin Leaderboard</h2>
+                <p>Total Player: <span id="status"></span></p>
+            </div>
+            <div class="col-3" id="rankstats">
+                <table class="table table-bordered table-responsive" border="1">
+                    <tbody id="statistics">
+                    <tr>
+                        <th>Rank</th>
+                        <th>Player</th>
+                        <th>Share</th>
+                    </tr>
+                    <tr id="loading_stats">
+                        <td colspan="4">LOADING</td>
+                    </tr>
+                    </tbody>
+
+                </table>
+            </div>
+            <div class="col-8">
+                <table class="table table-bordered table-responsive" border="1">
+                    <tbody id="leaderboard">
+                    <tr>
+                        <th width="50">#</th>
+                        <th width="50">Stars</th>
+                        <th>Name</th>
+                        <th width="100">Rank</th>
+                        <th width="400">User ID</th>
+                    </tr>
+                    <tr id="loading">
+                        <td colspan="5">LOADING</td>
+                    </tr>
+                    </tbody>
+
+                </table>
+                <button class="btn btn-primary w-100" id="loadmore">LOAD MORE</button>
+            </div>
+        </div>
+    </div>
+{% endblock %}
+{% block script %}
+    <script>
+        window.onload = async function() {
+
+            let rankMap = new Map();
+
+            function lazyBugFix(lb) {
+                let actualLb = [];
+                for (const item of lb._items) {
+                    if (actualLb.find(x => x.topRank === item.topRank) === undefined) {
+                        actualLb.push(item)
+                    }
+                }
+                return actualLb
+            }
+
+            let page = 1;
+
+            async function get_page(page) {
+                const url = `https://ronin.rest/origin/leaderboard?page=${page}`
+                return (await fetch(url)).json()
+            }
+
+            let next = true;
+            let total = 0
+
+            const lb = document.getElementById("leaderboard");
+            document.getElementById("loading").remove();
+
+            const chain_stat = await (await fetch("https://ronin.rest/ronin/statistics/chain")).json();
+            const origin_stat = await (await fetch("https://ronin.rest/origin/leaderboardStatistics")).json();
+
+            console.log(origin_stat)
+            document.getElementById("status").innerText = `${chain_stat.origin_player}`
+
+            async function nextPage() {
+                const data = await get_page(page);
+                total += data.length;
+
+                for (const item of data) {
+
+                    let rankMapSuffix = item.tier === 0 ? "" : " " + item.tier
+
+                    if (rankMap.has(item.rank + rankMapSuffix) === false) {
+                        rankMap.set(item.rank + rankMapSuffix, 1)
+                    } else {
+                        rankMap.set(item.rank + rankMapSuffix, rankMap.get(item.rank + rankMapSuffix) + 1)
+                    }
+
+                    const tr = document.createElement("tr");
+                    tr.id = item.id;
+                    const topRank = document.createElement("td")
+                    const name = document.createElement("td")
+                    const rank = document.createElement("td")
+                    const id = document.createElement("td")
+                    const stars = document.createElement("td");
+                    topRank.innerText = item.topRank
+                    name.innerText = item.name;
+                    let suffix = item.tier === 0 ? "" : ` ${item.tier}`
+                    rank.innerText = item.rank + suffix;
+                    id.innerText = item.userID;
+                    stars.innerText = item.vstar;
+                    tr.appendChild(topRank)
+                    tr.appendChild(stars);
+                    tr.appendChild(name)
+                    tr.appendChild(rank)
+                    tr.appendChild(id)
+                    lb.appendChild(tr)
+                }
+                page++;
+                next = data.length === 500;
+            }
+
+            let max = page + 5;
+            for (let i = page; i <= max; i++) {
+                await nextPage()
+            }
+            const moreHandler = async function () {
+                this.onclick = () => {
+                }
+                this.classList.add("disabled");
+                await nextPage();
+                this.onclick = moreHandler
+            }
+
+            document.getElementById("loadmore").onclick = moreHandler
+            let rankStats = ``
+            let ranks = [
+                "Challenger",
+                "Dragon 1", "Dragon 2", "Dragon 3", "Dragon 4",
+                "Tiger 1", "Tiger 2", "Tiger 3", "Tiger 4",
+                "Bear 1", "Bear 2", "Bear 3", "Bear 4",
+                "Wolf 1", "Wolf 2", "Wolf 3", "Wolf 4",
+                "Boar 1", "Boar 2", "Boar 3", "Boar 4",
+                "Chick 1", "Chick 2", "Chick 3", "Chick 4",
+                "Egg 1", "Egg 2", "Egg 3", "Egg 4",
+            ]
+
+            for (const rank of ranks) {
+
+                const rankData = origin_stat[rank]
+
+                rankStats += `<tr><td>${rank}</td><td>${rankData}</td><td>${((rankData / chain_stat.origin_player) * 100).toFixed(3)}%</td></tr>`
+            }
+            document.getElementById("loading_stats").remove()
+            document.getElementById("statistics").insertAdjacentHTML("beforeend", rankStats)
+        }
+    </script>
+{% endblock %}

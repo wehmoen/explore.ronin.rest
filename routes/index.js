@@ -14,6 +14,12 @@ router.get('/transfers', function(req, res, next) {
   res.render('transfers', { title: 'Axie Transfers' });
 });
 
+router.get('/leaderboard', function(req, res, next) {
+  res.render('leaderboard', { title: 'Origin Leaderboard' });
+});
+
+
+
 
 
 
