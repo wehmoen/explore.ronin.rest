@@ -9,6 +9,11 @@
                 <h2>Origin Leaderboard</h2>
                 <p>Total Player: <span id="status"></span></p>
             </div>
+            <div class="col-12 mb-3">
+                <h4>Find by userID/clientID</h4>
+                <input type="text" class="form-control" placeholder="userID/clientID" id="user">
+                <button id="search" class="btn btn-primary mt-1 w-100">Search</button>
+            </div>
             <div class="col-3" id="rankstats">
                 <table class="table table-bordered table-responsive" border="1">
                     <tbody id="statistics">
@@ -24,7 +29,7 @@
 
                 </table>
             </div>
-            <div class="col-8">
+            <div class="col-9">
                 <table class="table table-bordered table-responsive" border="1">
                     <tbody id="leaderboard">
                     <tr>
@@ -51,14 +56,20 @@
 
             let rankMap = new Map();
 
-            function lazyBugFix(lb) {
-                let actualLb = [];
-                for (const item of lb._items) {
-                    if (actualLb.find(x => x.topRank === item.topRank) === undefined) {
-                        actualLb.push(item)
-                    }
+            const search = document.getElementById("search");
+            const user = document.getElementById("user");
+
+            search.onclick = async function() {
+                const url = `https://ronin.rest/origin/leaderboard/search?userID=${user.value}`
+                const result = await (await fetch(url)).json()
+                if (result.result === null) {
+                    return alert("UserID not found in leaderboard. Please try again later.")
                 }
-                return actualLb
+
+                let info = `Name: ${result.result.name}\nRank: ${result.result.rank} ${result.result.rank !== "Challenger" ? result.result.tier : ""}\nVictory Stars: ${result.result.vstar}\nRank: ${result.result.topRank}`
+
+                alert(info)
+
             }
 
             let page = 1;
