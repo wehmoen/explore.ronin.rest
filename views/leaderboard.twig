@@ -60,6 +60,7 @@
             const user = document.getElementById("user");
 
             search.onclick = async function() {
+
                 const url = `https://ronin.rest/origin/leaderboard/search?userID=${user.value}`
                 const result = await (await fetch(url)).json()
                 if (result.result === null) {

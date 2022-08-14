@@ -73,6 +73,7 @@
       </div>
     </div>
     <div class="row" id="health_info"></div>
+    <div class="row mt-2" id="pgbs"></div>
   </div>
 {% endblock %}
 {% block script %}
@@ -105,8 +106,40 @@
     }
 
     for (const h in service_health) {
-      health_container(h, service_health[h].healthy)
+      if (h !== "sync") {
+        health_container(h, service_health[h].healthy)
+      }
     }
+
+    function createProgressBar(label, current, max) {
+
+      const progress = current / max * 100;
+      const progress_fmt = progress.toFixed(2) + "%"
+
+      const color = progress <= 99.9 ? "bg-warning" : "bg-success"
+      const type = max -current > 50 ? "progress-bar-striped progress-bar-animated" : ""
+
+
+      return ` <div class="col-12 mt-4">
+                <h5>${label}</h5>
+                <div data-progress="${progress}" class="progress" style="height: 20px">
+                  <div class="progress-bar ${type} ${color} " role="progressbar" aria-label="Info striped example" style="width: ${progress}%" aria-valuenow="50" aria-valuemin="0" aria-valuemax="100">
+    <b>${current} / ${max} (${progress_fmt})</b>
+</div>
+                </div>
+              </div>`
+
+    }
+
+    let progress_old = service_health["sync"].old;
+    let progress_new = service_health["sync"].new;
+
+    const old_pgb = createProgressBar("Services: transactions, axie-transfers, erc-transfer", progress_old.db, progress_old.chain)
+    const new_pgb = createProgressBar("Services: axie-sales", progress_new.db, progress_new.chain)
+
+    document.getElementById("pgbs").innerHTML = old_pgb + new_pgb
+
+
   }
 </script>
 {% endblock %}
