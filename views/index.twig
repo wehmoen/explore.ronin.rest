@@ -134,8 +134,8 @@
     let progress_old = service_health["sync"].old;
     let progress_new = service_health["sync"].new;
 
-    const old_pgb = createProgressBar("Services: transactions, axie-transfers, erc-transfer", progress_old.db, progress_old.chain)
-    const new_pgb = createProgressBar("Services: axie-sales", progress_new.db, progress_new.chain)
+    const old_pgb = createProgressBar("Services: transactions, axie-transfers, erc-transfer, axie-sales-v1", progress_old.db, progress_old.chain)
+    const new_pgb = createProgressBar("Services: ronin.rest V2", progress_new.db, progress_new.chain)
 
     document.getElementById("pgbs").innerHTML = old_pgb + new_pgb
 
