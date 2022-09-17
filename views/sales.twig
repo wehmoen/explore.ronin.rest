@@ -1,12 +1,12 @@
 {% extends 'layout.twig' %}
 
 {% block body %}
-    <div class="container">
-        <h2>Simple Axie Transfer History <small>(RONIN only!)</small></h2>
+    <div class="container mt-4">
+        <h2>Axie Sale History</h2>
 
         <div id="select">
-            <input min="0" type="number" value="90212" placeholder="Enter AXIE Id here and click GO!" class="form-control-lg w-100">
-            <button class="btn btn-primary w-100 mt-2">GO!</button>
+            <input min="0" type="number" value="272409" placeholder="Enter AXIE Id here and click GO!" class="form-control-lg w-100">
+            <button class="btn btn-primary w-100 mt-2">Load Marketplace Sales</button>
 
         </div>
 
@@ -67,7 +67,7 @@
 
             btn.onclick = async function() {
                 const axieId = inp.value;
-                const url = `https://ronin.rest/archive/getAxieSaleHistory/${axieId}`;
+                const url = `https://ronin.rest/archive/getSaleHistory/axie/${axieId}`;
                 api.href = url;
                 api.classList.remove("d-none")
                 const data = await (await fetch(url)).json()
@@ -90,9 +90,9 @@
                         const buyer = td();
                         buyer.innerText = sale.buyer;
                         const price = td();
-                        const token = token_map.get(sale.token);
+                        const token = token_map.get("0xc99a6a985ed2cac1ef41640596c5a5f9f4e19ef5");
                         if (token !== undefined) {
-                            price.innerText = `${token.format(sale.price).toFixed(7)} ${token.name}`
+                            price.innerText = `${token.format(Number("0x" + sale.price)).toFixed(7)} ${token.name}`
                         } else {
                             price.innerText = `${sale.price} ${sale.token}`
                         }

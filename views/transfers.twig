@@ -1,18 +1,12 @@
 {% extends 'layout.twig' %}
 
 {% block body %}
-    <div class="container">
-        <h2>Simple Axie Sale History <small>(RONIN only!)</small></h2>
+    <div class="container mt-4">
+        <h2>Axie Transfer History <small>(RONIN only!)</small></h2>
 
         <div id="select">
-            <input min="0" type="number" value="240424" placeholder="Enter AXIE Id here and click GO!" class="form-control-lg w-100">
-            <button class="btn btn-primary w-100 mt-2">GO!</button>
-
-            <div class="mt-2">
-                <p class="alert alert-info">
-                    Keep in mind that this page only list marketplace sales.
-                </p>
-            </div>
+            <input min="0" type="number" value="272409" placeholder="Enter AXIE Id here and click GO!" class="form-control-lg w-100">
+            <button class="btn btn-primary w-100 mt-2">Load Transfers</button>
         </div>
 
         <div class="table-responsive">
@@ -57,9 +51,14 @@
                 return a
             }
 
+            async function getBlockTs(block) {
+                const data = await (await fetch("https://ronin.rest/ronin/getBlock/"+block)).json()
+                return (new Date(Number(data.timestamp) * 1000)).toISOString().split("T").join(" ")
+            }
+
             btn.onclick = async function() {
                 const axieId = inp.value;
-                const url = `https://ronin.rest/archive/getAxieTransferHistory/${axieId}`;
+                const url = `https://ronin.rest/archive/getTransferHistory/axie/${axieId}`;
                 api.href = url;
                 api.classList.remove("d-none")
                 const data = await (await fetch(url)).json()
@@ -83,7 +82,7 @@
                         to.innerText = transfer.to;
 
                         const date = td();
-                        date.innerText = (new Date(transfer.created_at)).toISOString().split("T").join(" ")
+                        date.innerText = await getBlockTs(transfer.block)
 
                         row.appendChild(from)
                         row.appendChild(to)
