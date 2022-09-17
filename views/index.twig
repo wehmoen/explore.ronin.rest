@@ -80,36 +80,6 @@
 <script>
   window.onload = async function() {
     const service_health = await (await fetch("https://ronin.rest/misc/health")).json()
-    function health_container(name, healthy) {
-      const col = document.createElement("div");
-      col.classList.add("col");
-      col.classList.add("mt-2");
-      const con = document.createElement("div");
-      con.classList.add(`bg-${healthy ? 'success': 'danger'}`);
-      con.classList.add("card")
-      const body = document.createElement("div")
-      body.classList.add("card-body")
-      body.classList.add("text-center")
-      const title = document.createElement("h4")
-      title.classList.add("card-title")
-      title.innerText = name;
-      const content = document.createElement("span")
-      content.innerText = healthy ? "UP!": "DOWN!";
-      content.classList.add("text-white")
-      content.classList.add("fw-bold")
-      content.classList.add("fs-3")
-      body.appendChild(title)
-      body.appendChild(content)
-      con.appendChild(body)
-      col.appendChild(con)
-      document.getElementById("health_info").appendChild(col)
-    }
-
-    for (const h in service_health) {
-      if (h !== "sync") {
-        health_container(h, service_health[h].healthy)
-      }
-    }
 
     function createProgressBar(label, current, max) {
 
@@ -131,13 +101,7 @@
 
     }
 
-    let progress_old = service_health["sync"].old;
-    let progress_new = service_health["sync"].new;
-
-    const old_pgb = createProgressBar("Services: transactions, axie-transfers, erc-transfer, axie-sales-v1", progress_old.db, progress_old.chain)
-    const new_pgb = createProgressBar("Services: ronin.rest V2", progress_new.db, progress_new.chain)
-
-    document.getElementById("pgbs").innerHTML = old_pgb + new_pgb
+    document.getElementById("pgbs").innerHTML = createProgressBar("Ronin.Rest Sync Status", service_health["sync"].db, service_health["sync"].chain)
 
 
   }
