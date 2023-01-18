@@ -4,7 +4,7 @@
     <div class="container mt-4">
         <h2>Ronin.Rest Analytics</h2>
 
-        <canvas id="analytics" ></canvas>
+        <canvas id="analytics"></canvas>
 
         <div class="container">
         </div>
@@ -17,53 +17,56 @@
     <script type="module">
 
         const IGNORED_ROUTES = [
-
+            "index.health",
+            "internal.analytics",
+            "index.routes"
         ]
 
-        window.onload = async function() {
+        window.onload = async function () {
+
+            let LABELS = []
 
             async function loadData() {
                 const response = await fetch('https://go.ronin.rest/internal/analytics');
                 const data = await response.json();
 
                 const output = [];
-                const labels = [];
 
                 for (const entry of data) {
+
                     if (IGNORED_ROUTES.includes(entry.label)) {
                         continue;
                     }
+
                     for (const d of entry.data) {
-                        if (labels.includes(d.timestamp) === false) {
-                            labels.push(d.timestamp);
-                        }
+                        LABELS.push(d.timestamp);
                     }
 
                     output.push({
                         label: entry.label,
-                        data: entry.data.map(x => x.request_count)
+                        data: entry.data.map(k => {
+                            return k.request_count;
+                        }).sort(),
                     })
                 }
-                return {output, labels};
+                return output;
             }
 
             const data = await loadData();
-            console.log(                {
-                    type: "line",
-                    labels: data.labels,
-                    data: data.output,
+            console.log(LABELS)
 
-                }
-            );
+            const LBL = [...new Set(LABELS)].sort();
+
             new Chart(
                 document.getElementById("analytics"),
                 {
                     type: "line",
+                    labels: LBL,
                     data: {
-                        labels: data.labels,
-                        datasets: data.output,
-                    },
-
+                        labels: LBL,
+                        datasets: data,
+                        spanGaps: true,
+                    }
                 }
             )
         }
