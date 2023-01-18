@@ -1,0 +1,71 @@
+{% extends 'layout.twig' %}
+
+{% block body %}
+    <div class="container mt-4">
+        <h2>Ronin.Rest Analytics</h2>
+
+        <canvas id="analytics" ></canvas>
+
+        <div class="container">
+        </div>
+
+    </div>
+
+{% endblock %}
+{% block script %}
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script type="module">
+
+        const IGNORED_ROUTES = [
+
+        ]
+
+        window.onload = async function() {
+
+            async function loadData() {
+                const response = await fetch('https://go.ronin.rest/internal/analytics');
+                const data = await response.json();
+
+                const output = [];
+                const labels = [];
+
+                for (const entry of data) {
+                    if (IGNORED_ROUTES.includes(entry.label)) {
+                        continue;
+                    }
+                    for (const d of entry.data) {
+                        if (labels.includes(d.timestamp) === false) {
+                            labels.push(d.timestamp);
+                        }
+                    }
+
+                    output.push({
+                        label: entry.label,
+                        data: entry.data.map(x => x.request_count)
+                    })
+                }
+                return {output, labels};
+            }
+
+            const data = await loadData();
+            console.log(                {
+                    type: "line",
+                    labels: data.labels,
+                    data: data.output,
+
+                }
+            );
+            new Chart(
+                document.getElementById("analytics"),
+                {
+                    type: "line",
+                    data: {
+                        labels: data.labels,
+                        datasets: data.output,
+                    },
+
+                }
+            )
+        }
+    </script>
+{% endblock %}

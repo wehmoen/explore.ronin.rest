@@ -18,6 +18,9 @@ router.get('/leaderboard', function(req, res, next) {
   res.render('leaderboard', { title: 'Origin Leaderboard' });
 });
 
+router.get("/analytics", function(req, res, next) {
+    res.render("analytics", { title: "Ronin.Rest Analytics" });
+})
 
 
 
