@@ -1,13 +1,8 @@
 {% extends 'layout.twig' %}
 
 {% block body %}
-    <div class="container mt-4">
+    <div class="container mt-4" id="charts">
         <h2>Ronin.Rest Analytics</h2>
-
-        <canvas id="analytics"></canvas>
-
-        <div class="container">
-        </div>
 
     </div>
 
@@ -24,8 +19,6 @@
 
         window.onload = async function () {
 
-            let LABELS = []
-
             async function loadData() {
                 const response = await fetch('https://go.ronin.rest/internal/analytics');
                 const data = await response.json();
@@ -38,37 +31,44 @@
                         continue;
                     }
 
-                    for (const d of entry.data) {
-                        LABELS.push(d.timestamp);
-                    }
-
                     output.push({
                         label: entry.label,
-                        data: entry.data.map(k => {
-                            return k.request_count;
-                        }).sort(),
+                        fill: true,
+                        labels: entry.data.map(k => k.timestamp),
+                        data: entry.data.map(k => k.request_count)
                     })
                 }
                 return output;
             }
 
             const data = await loadData();
-            console.log(LABELS)
 
-            const LBL = [...new Set(LABELS)].sort();
+            const charts = document.getElementById('charts');
 
-            new Chart(
-                document.getElementById("analytics"),
-                {
-                    type: "line",
-                    labels: LBL,
-                    data: {
-                        labels: LBL,
-                        datasets: data,
-                        spanGaps: true,
+            for (const d of data) {
+                const c = document.createElement("canvas");
+                charts.appendChild(c);
+                new Chart(
+                    c,
+                    {
+                        type: "line",
+                        data: {
+                            datasets: [
+                                {
+                                    label: d.label,
+                                    data:d.data
+                                }
+                            ],
+                            labels: d.labels,
+                        },
+                        options: {
+                            spanGaps: true
+                        }
                     }
-                }
-            )
+                )
+
+            }
+
         }
     </script>
 {% endblock %}
