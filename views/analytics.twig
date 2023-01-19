@@ -1,9 +1,9 @@
 {% extends 'layout.twig' %}
 
 {% block body %}
-    <div class="container mt-4" id="charts">
+    <div class="container mt-4">
         <h2>Ronin.Rest Analytics</h2>
-
+            <div class="row" id="charts"></div>
     </div>
 
 {% endblock %}
@@ -12,9 +12,9 @@
     <script type="module">
 
         const IGNORED_ROUTES = [
-            "index.health",
-            "internal.analytics",
-            "index.routes"
+            // "index.health",
+            // "internal.analytics",
+            // "index.routes"
         ]
 
         window.onload = async function () {
@@ -46,8 +46,11 @@
             const charts = document.getElementById('charts');
 
             for (const d of data) {
+                const div = document.createElement('div');
+                div.classList.add("col-md-6")
                 const c = document.createElement("canvas");
-                charts.appendChild(c);
+                div.appendChild(c)
+                charts.appendChild(div);
                 new Chart(
                     c,
                     {
