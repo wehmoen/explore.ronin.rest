@@ -76,10 +76,22 @@
 {% endblock %}
 {% block script %}
 <script>
-  window.onload = async function() {
-    const service_health = await (await fetch("https://ronin.rest/misc/health")).json()
 
-    function createProgressBar(label, current, max) {
+
+
+  window.onload = async function() {
+
+    async function updateHealth() {
+      const service_health = await (await fetch("https://ronin.rest/misc/health")).json()
+      const health_info = document.getElementById("main-service")
+      if (health_info == null) {
+        document.getElementById("pgbs").innerHTML = createProgressBar("main-service", "Ronin.Rest Sync Status", service_health["sync"].db, service_health["sync"].chain)
+      } else {
+        health_info.outerHTML = createProgressBar("main-service", "Ronin.Rest Sync Status", service_health["sync"].db, service_health["sync"].chain)
+      }
+    }
+
+    function createProgressBar(id, label, current, max) {
 
       const progress = current / max * 100;
       const progress_fmt = progress.toFixed(2) + "%"
@@ -88,7 +100,7 @@
       const type = max -current > 50 ? "progress-bar-striped progress-bar-animated" : ""
 
 
-      return ` <div class="col-12 mt-4">
+      return ` <div class="col-12 mt-4" id="${id}">
                 <h5>${label}</h5>
                 <div data-progress="${progress}" class="progress" style="height: 20px">
                   <div class="progress-bar ${type} ${color} " role="progressbar" aria-label="Info striped example" style="width: ${progress}%" aria-valuenow="50" aria-valuemin="0" aria-valuemax="100">
@@ -99,8 +111,12 @@
 
     }
 
-    document.getElementById("pgbs").innerHTML = createProgressBar("Ronin.Rest Sync Status", service_health["sync"].db, service_health["sync"].chain)
 
+    await updateHealth();
+
+    setInterval(async function() {
+      await updateHealth();
+    }, 1000)
 
   }
 </script>
