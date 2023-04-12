@@ -72,6 +72,7 @@
                 }
                 loginButton.innerText = "Logout";
                 userSpan.innerText = user.profile.name;
+                window.history.pushState({}, document.title, window.location.origin)
             } else {
                 loginButton.onclick = async function () {
                     await userManager.signinRedirect();
