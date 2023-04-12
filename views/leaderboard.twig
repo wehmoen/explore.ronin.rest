@@ -53,6 +53,8 @@
     <script>
         window.onload = async function() {
 
+            await sessionHandler();
+
             let rankMap = new Map();
 
             const search = document.getElementById("search");
@@ -162,6 +164,8 @@
             }
             document.getElementById("loading_stats").remove()
             document.getElementById("statistics").insertAdjacentHTML("beforeend", rankStats)
+
+
         }
     </script>
 {% endblock %}

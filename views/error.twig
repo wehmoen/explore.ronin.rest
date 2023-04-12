@@ -7,3 +7,10 @@
     <a href="/">GO HOME</a>
   </div>
 {% endblock %}
+{% block script %}
+<script>
+  window.onload = async function() {
+    await sessionHandler();
+  }
+</script>
+{% endblock %}

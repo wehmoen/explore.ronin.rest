@@ -19,6 +19,8 @@
 
         window.onload = async function () {
 
+            await sessionHandler();
+
             async function loadData() {
                 const response = await fetch('https://go.ronin.rest/internal/analytics');
                 const data = await response.json();

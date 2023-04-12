@@ -26,7 +26,9 @@
 {% endblock %}
 {% block script %}
     <script>
-        window.onload = function() {
+        window.onload = async function() {
+
+            await sessionHandler();
 
             const btn = document.querySelector("button");
             const inp = document.querySelector('input[type="number"]');

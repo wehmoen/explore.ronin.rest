@@ -81,6 +81,8 @@
 
   window.onload = async function() {
 
+    await sessionHandler();
+
     async function updateHealth() {
       const service_health = await (await fetch("https://ronin.rest/misc/health")).json()
       const health_info = document.getElementById("main-service")
@@ -117,7 +119,6 @@
     setInterval(async function() {
       await updateHealth();
     }, 500)
-
   }
 </script>
 {% endblock %}

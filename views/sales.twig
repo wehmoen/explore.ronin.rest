@@ -29,7 +29,9 @@
 {% endblock %}
 {% block script %}
     <script>
-        window.onload = function() {
+        window.onload = async function() {
+
+            await sessionHandler();
 
             const token_map = new Map();
             token_map.set("0xc99a6a985ed2cac1ef41640596c5a5f9f4e19ef5", {

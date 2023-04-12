@@ -21,6 +21,9 @@ router.get('/leaderboard', function(req, res, next) {
 router.get("/analytics", function(req, res, next) {
     res.render("analytics", { title: "Ronin.Rest Analytics" });
 })
+router.get("/redirect", function(req, res, next) {
+    res.render("redirect", { title: "Ronin.Rest Redirect" });
+});
 
 
 
